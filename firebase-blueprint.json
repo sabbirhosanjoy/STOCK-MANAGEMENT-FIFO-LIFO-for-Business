@@ -1,0 +1,172 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered business user profile and security PIN record",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "User Gmail address",
+          "maxLength": 128
+        },
+        "name": {
+          "type": "string",
+          "description": "User full name or business display name",
+          "maxLength": 100
+        },
+        "pin": {
+          "type": "string",
+          "description": "Secret 4 to 8 digit security PIN",
+          "minLength": 4,
+          "maxLength": 16
+        },
+        "role": {
+          "type": "string",
+          "description": "User role description",
+          "maxLength": 50
+        },
+        "avatar": {
+          "type": "string",
+          "description": "Avatar URL",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of user creation",
+          "maxLength": 50
+        },
+        "lastLogin": {
+          "type": "string",
+          "description": "ISO timestamp of last login",
+          "maxLength": 50
+        }
+      },
+      "required": ["email", "name", "pin", "createdAt"]
+    },
+    "BusinessSettings": {
+      "title": "BusinessSettings",
+      "description": "Business settings and configuration",
+      "type": "object",
+      "properties": {
+        "businessNameEn": { "type": "string", "maxLength": 100 },
+        "businessNameBn": { "type": "string", "maxLength": 100 },
+        "tagline": { "type": "string", "maxLength": 200 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "email": { "type": "string", "maxLength": 128 },
+        "address": { "type": "string", "maxLength": 300 },
+        "facebookPageUrl": { "type": "string", "maxLength": 200 },
+        "invoiceFooterNote": { "type": "string", "maxLength": 500 },
+        "defaultCourier": { "type": "string", "maxLength": 50 },
+        "appPin": { "type": "string", "maxLength": 16 },
+        "isPinEnabled": { "type": "boolean" },
+        "autoDriveBackup": { "type": "boolean" },
+        "lastBackupDate": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["businessNameBn", "email", "appPin"]
+    },
+    "TaskItem": {
+      "title": "TaskItem",
+      "description": "Daily to-do tasks and reminders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "date": { "type": "string", "maxLength": 20 },
+        "time": { "type": "string", "maxLength": 10 },
+        "priority": { "type": "string", "enum": ["low", "medium", "high"], "maxLength": 20 },
+        "category": { "type": "string", "maxLength": 50 },
+        "completed": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "title", "date", "priority", "completed"]
+    },
+    "InventoryItem": {
+      "title": "InventoryItem",
+      "description": "Stock inventory items with batch tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "sku": { "type": "string", "maxLength": 50 },
+        "nameEn": { "type": "string", "maxLength": 150 },
+        "nameBn": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string", "maxLength": 50 },
+        "valuationMethod": { "type": "string", "enum": ["FIFO", "LIFO"], "maxLength": 10 },
+        "defaultSellingPrice": { "type": "number" },
+        "alertThreshold": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "batches": { "type": "array" }
+      },
+      "required": ["id", "sku", "nameBn", "valuationMethod", "defaultSellingPrice"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer order with invoice and courier tracking",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "invoiceNumber": { "type": "string", "maxLength": 50 },
+        "customerName": { "type": "string", "maxLength": 100 },
+        "customerPhone": { "type": "string", "maxLength": 30 },
+        "customerAddress": { "type": "string", "maxLength": 300 },
+        "items": { "type": "array" },
+        "subtotal": { "type": "number" },
+        "deliveryCharge": { "type": "number" },
+        "discount": { "type": "number" },
+        "totalAmount": { "type": "number" },
+        "paidAmount": { "type": "number" },
+        "dueAmount": { "type": "number" },
+        "status": { "type": "string", "maxLength": 50 },
+        "courier": { "type": "string", "maxLength": 50 },
+        "consignmentId": { "type": "string", "maxLength": 100 },
+        "trackingCode": { "type": "string", "maxLength": 100 },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "cogs": { "type": "number" },
+        "netProfit": { "type": "number" }
+      },
+      "required": ["id", "invoiceNumber", "customerName", "customerPhone", "totalAmount", "status", "createdAt"]
+    },
+    "ExpenseItem": {
+      "title": "ExpenseItem",
+      "description": "Business expense entries",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 100 },
+        "category": { "type": "string", "maxLength": 50 },
+        "description": { "type": "string", "maxLength": 200 },
+        "amount": { "type": "number" },
+        "date": { "type": "string", "maxLength": 20 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["id", "category", "description", "amount", "date"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile with secret security PIN and metadata"
+    },
+    "/users/{userId}/settings/{settingsId}": {
+      "schema": "BusinessSettings",
+      "description": "User business settings and configuration"
+    },
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": "TaskItem",
+      "description": "User daily tasks and reminders"
+    },
+    "/users/{userId}/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "User inventory items with FIFO/LIFO batches"
+    },
+    "/users/{userId}/orders/{orderId}": {
+      "schema": "Order",
+      "description": "User sales orders and invoices"
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": "ExpenseItem",
+      "description": "User business expense records"
+    }
+  }
+}

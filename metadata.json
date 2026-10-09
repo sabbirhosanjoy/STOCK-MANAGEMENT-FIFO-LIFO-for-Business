@@ -1,0 +1,8 @@
+{
+  "name": "NakshaLata - নকশালতা বিজনেস ও স্টক ম্যানেজার Browser",
+  "description": "NakshaLata (নকশালতা) এর কাজের টু-ডু রিমাইন্ডার, আলাদা FIFO/LIFO স্টক লেজার, কুরিয়ার ডেলিভারি ও ট্র্যাকিং, QR ইনভয়েস এবং লাভ-ক্ষতি রিপোর্ট ম্যানেজার।",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

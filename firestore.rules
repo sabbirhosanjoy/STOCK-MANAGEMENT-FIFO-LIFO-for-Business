@@ -1,0 +1,123 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global catch-all default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Connectivity test route
+    match /test/{docId} {
+      allow read: if true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['email', 'name', 'pin', 'createdAt'])
+        && data.email is string && data.email.size() <= 128
+        && data.name is string && data.name.size() <= 100
+        && data.pin is string && data.pin.size() >= 4 && data.pin.size() <= 16
+        && data.createdAt is string && data.createdAt.size() <= 50;
+    }
+
+    function isValidSettings(data) {
+      return data.keys().hasAll(['businessNameBn', 'email', 'appPin'])
+        && data.businessNameBn is string && data.businessNameBn.size() <= 100
+        && data.email is string && data.email.size() <= 128
+        && data.appPin is string && data.appPin.size() <= 16;
+    }
+
+    function isValidTask(data) {
+      return data.keys().hasAll(['id', 'title', 'date', 'priority', 'completed'])
+        && data.id is string && data.id.size() <= 100
+        && data.title is string && data.title.size() <= 200
+        && data.date is string && data.date.size() <= 20
+        && data.priority is string && data.priority.size() <= 20
+        && data.completed is bool;
+    }
+
+    function isValidInventory(data) {
+      return data.keys().hasAll(['id', 'sku', 'nameBn', 'valuationMethod', 'defaultSellingPrice'])
+        && data.id is string && data.id.size() <= 100
+        && data.sku is string && data.sku.size() <= 50
+        && data.nameBn is string && data.nameBn.size() <= 150
+        && data.valuationMethod is string && data.valuationMethod.size() <= 10
+        && data.defaultSellingPrice is number;
+    }
+
+    function isValidOrder(data) {
+      return data.keys().hasAll(['id', 'invoiceNumber', 'customerName', 'customerPhone', 'totalAmount', 'status', 'createdAt'])
+        && data.id is string && data.id.size() <= 100
+        && data.invoiceNumber is string && data.invoiceNumber.size() <= 50
+        && data.customerName is string && data.customerName.size() <= 100
+        && data.customerPhone is string && data.customerPhone.size() <= 30
+        && data.totalAmount is number
+        && data.status is string && data.status.size() <= 50
+        && data.createdAt is string && data.createdAt.size() <= 50;
+    }
+
+    function isValidExpense(data) {
+      return data.keys().hasAll(['id', 'category', 'description', 'amount', 'date'])
+        && data.id is string && data.id.size() <= 100
+        && data.category is string && data.category.size() <= 50
+        && data.description is string && data.description.size() <= 200
+        && data.amount is number
+        && data.date is string && data.date.size() <= 20;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow get: if isValidId(userId);
+      allow list: if true;
+      allow create: if isValidId(userId) && isValidUser(incoming());
+      allow update: if isValidId(userId) && isValidUser(incoming());
+      allow delete: if isValidId(userId);
+
+      // Business Settings Subcollection
+      match /settings/{settingsId} {
+        allow get, list: if isValidId(userId) && isValidId(settingsId);
+        allow create, update: if isValidId(userId) && isValidId(settingsId) && isValidSettings(incoming());
+        allow delete: if isValidId(userId) && isValidId(settingsId);
+      }
+
+      // Tasks Subcollection
+      match /tasks/{taskId} {
+        allow get, list: if isValidId(userId) && isValidId(taskId);
+        allow create, update: if isValidId(userId) && isValidId(taskId) && isValidTask(incoming());
+        allow delete: if isValidId(userId) && isValidId(taskId);
+      }
+
+      // Inventory Subcollection
+      match /inventory/{itemId} {
+        allow get, list: if isValidId(userId) && isValidId(itemId);
+        allow create, update: if isValidId(userId) && isValidId(itemId) && isValidInventory(incoming());
+        allow delete: if isValidId(userId) && isValidId(itemId);
+      }
+
+      // Orders Subcollection
+      match /orders/{orderId} {
+        allow get, list: if isValidId(userId) && isValidId(orderId);
+        allow create, update: if isValidId(userId) && isValidId(orderId) && isValidOrder(incoming());
+        allow delete: if isValidId(userId) && isValidId(orderId);
+      }
+
+      // Expenses Subcollection
+      match /expenses/{expenseId} {
+        allow get, list: if isValidId(userId) && isValidId(expenseId);
+        allow create, update: if isValidId(userId) && isValidId(expenseId) && isValidExpense(incoming());
+        allow delete: if isValidId(userId) && isValidId(expenseId);
+      }
+    }
+  }
+}
